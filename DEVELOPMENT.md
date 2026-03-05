@@ -45,29 +45,33 @@ Every rule must be traceable back to a specific technical or legal provision.
 - **Domain-First Namespacing:** Organize rules by technical domain (e.g., `aeclib.occupancy`) and expose them at the top level via `__init__.py`.
 - **String-Friendly Enums:** Use `StrEnum`-style patterns internally for robust data management while allowing users to provide raw strings.
 
-## 3. Testing
-`aeclib` uses **pytest** as the primary testing framework.
+## 3. Build and Test Sequence
+`aeclib` uses **tox** to orchestrate testing, linting, and formatting in isolated environments.
 
-### 3.1 Running Tests
-If you have performed an editable install (`pip install -e .`), you can run the tests from the root of the project:
-
-```bash
-# Run all tests
-pytest
-
-# Run a specific test file
-pytest tests/occupancy/test_occupancy.py
-```
-
-If you have not performed an editable install, you must manually set the `PYTHONPATH`:
+### 3.1 The "Build" Command
+To run the full suite (Tests + Linting + Formatting Check):
 
 ```bash
-export PYTHONPATH=$PYTHONPATH:$(pwd)/src
-pytest
+tox
 ```
 
-### 3.2 Adding New Tests
-Every new validation rule or domain must include a corresponding test file in the `tests/` directory. Tests should verify both `True` (Pass) and `False` (Fail) scenarios and confirm that appropriate warnings are logged.
+### 3.2 Automated Formatting and Fixing
+To automatically fix linting issues and reformat the code to meet the project's style standards (Line length 88, etc.):
+
+```bash
+tox -e fix
+```
+
+### 3.3 Running Specific Tasks
+- **Tests only:** `pytest` or `tox -e py39`
+- **Linting check only:** `tox -e lint`
+- **Formatting check only:** `tox -e format`
+
+### 3.4 Style Standards
+- **Linter/Formatter:** `ruff`
+- **Max Line Length:** 88 characters
+- **Quotes:** Double quotes preferred
+- **Import Sorting:** Automatic via `ruff` (isort rules)
 
 ## 4. Commit Standards
 - **Format:** Use the [Conventional Commits](https://www.conventionalcommits.org/) specification.

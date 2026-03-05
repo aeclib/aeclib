@@ -33,3 +33,19 @@ classifiers = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+# Target Python 3.9
+target-version = "py39"
+line-length = 88
+
+[tool.ruff.lint]
+# Enable standard linting rules (E: Error, F: Pyflakes, I: Isort)
+select = ["E", "F", "I"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
