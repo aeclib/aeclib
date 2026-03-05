@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aeclib"
+version = "0.0.1"
+authors = [
+  { name="Nguyen Ngo", email="nguyen@aeclib.com" },
+]
+description = "Open-source computational logic engine for global building codes and standards."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "Apache-2.0"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/aeclib/aeclib"
+"Bug Tracker" = "https://github.com/aeclib/aeclib/issues"
+"Documentation" = "https://github.com/aeclib/aeclib#readme"
+
+[tool.setuptools.packages.find]
+where = ["src"]
