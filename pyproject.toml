@@ -49,3 +49,9 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+
+[tool.pytest.ini_options]
+log_cli = false
+log_cli_level = "WARNING"
+testpaths = ["tests"]
+pythonpath = ["src"]

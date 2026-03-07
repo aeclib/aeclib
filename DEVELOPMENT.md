@@ -24,6 +24,8 @@ The primary goal of `aeclib` is to validate designs, not to generate them.
 - **Boolean Returns:** Validation rules must return a `bool` (`True` for Pass, `False` for Fail).
 - **Side-Effect Reporting:** Compliance failures must be reported using the standard Python `logging` module (e.g., `logger.warning`).
 - **Statelessness:** Rules must be implemented as pure, stateless functions. They take design facts as input and return a deterministic result.
+- **Direct Fact Validation:** Always validate the design fact (e.g., occupant count) directly against a calculated legal limit, rather than converting the design into a secondary metric (e.g., density).
+- **Mathematical Intuition:** Logic should be written to be as readable as possible, making intuitive sense to an architect.
 
 ### 2.2 API Style: The "Architect-Friendly" Interface
 The library should integrate seamlessly into existing AEC workflows (Revit, Rhino, JSON exports).

@@ -39,6 +39,8 @@ def validate_occupant_load_without_fixed_seating(
         logger.error(f"Unsupported function type: {function_type}")
         raise ValueError(f"Function type '{function_type}' is not supported.")
 
+    logger.info(f"Checking {function_type} occupancy load factors...")
+    logger.info(f"{function_type} occupancy load factors: {rule}")
     factor = rule["factor"]
     basis = rule["basis"]
 
@@ -80,16 +82,14 @@ def validate_increased_occupant_load(area: float, occupant_count: int) -> bool:
     if occupant_count <= 0:
         return True
 
-    # IBC 2024 Section 1004.5.1 specifies 7 square feet per occupant
-    # as the absolute limit.
     max_density_threshold = 7.0
-    actual_density = area / occupant_count
-    is_compliant = actual_density >= max_density_threshold
+    max_occupant_count = area / max_density_threshold
+    is_compliant = occupant_count <= max_occupant_count
 
     if not is_compliant:
         logger.warning(
-            f"Compliance Fail: Density of {actual_density:.2f} sqft/person "
-            f"exceeds limit of {max_density_threshold}"
+            f"Compliance Fail: Occupant count {occupant_count} "
+            f"exceeds limit of {max_occupant_count}"
         )
 
     return is_compliant
