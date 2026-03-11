@@ -1,4 +1,5 @@
 from .generic import (
+    validate_ceiling_height,
     validate_increased_occupant_load,
     validate_occupant_load_without_fixed_seating,
 )
@@ -6,4 +7,5 @@ from .generic import (
 __all__ = [
     "validate_occupant_load_without_fixed_seating",
     "validate_increased_occupant_load",
+    "validate_ceiling_height",
 ]

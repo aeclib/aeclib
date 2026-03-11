@@ -21,8 +21,8 @@ All contributors (human and AI) must adhere to these rules to ensure the library
 ### 2.1 Intent: Compliance-Only Logic
 The primary goal of `aeclib` is to validate designs, not to generate them.
 
-- **Boolean Returns:** Validation rules must return a `bool` (`True` for Pass, `False` for Fail).
-- **Side-Effect Reporting:** Compliance failures must be reported using the standard Python `logging` module (e.g., `logger.warning`).
+- **Standardized Reporting:** Validation rules must return a `ComplianceResult` object (`PASS`, `FAIL`, or `NOT_APPLICABLE`).
+- **Minimalist Logging:** Use `logger.info` for informational logic path hints to user. Use `logger.error` for system/data errors. Do *not* use `logger.warning` preceding returning compliance failures; the `ComplianceResult` message is the authoritative report.
 - **Statelessness:** Rules must be implemented as pure, stateless functions. They take design facts as input and return a deterministic result.
 - **Direct Fact Validation:** Always validate the design fact (e.g., occupant count) directly against a calculated legal limit, rather than converting the design into a secondary metric (e.g., density).
 - **Mathematical Intuition:** Logic should be written to be as readable as possible, making intuitive sense to an architect.
