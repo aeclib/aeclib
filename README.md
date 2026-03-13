@@ -34,7 +34,7 @@ The library is designed to be composed into your own application logic. Below is
 ```python
 from aeclib.occupancy import validate_occupant_load_without_fixed_seating, validate_increased_occupant_load
 
-class MyProjectChecker:
+class OccupancyValidator:
     def check_space_occupancy(self, data: dict):
         # 1. Check required minimum occupant load (Section 1004.5)
         is_load_valid = validate_occupant_load_without_fixed_seating(
@@ -54,13 +54,13 @@ class MyProjectChecker:
 ```
 
 ### Expected Output
-When a design fact fails to comply, the library will return `False` and log a detailed warning:
+When a design fact fails to comply, the library will return `FAIL` and log a detailed warning:
 
 ```text
-WARNING:aeclib:Compliance Fail: Design occupancy (35) is less than required minimum of 40 for educational_classroom (net area: 800.0, factor: 20).
+WARNING:aeclib:[FAIL] Design occupancy (35) is less than required minimum of 40 for educational_classroom (net area: 800.0, factor: 20).
 ```
 
-When a design is compliant, the function returns `True`.
+When a design is compliant, the function returns `PASS`.
 
 ## License
 
