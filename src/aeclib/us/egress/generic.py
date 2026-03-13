@@ -4,12 +4,14 @@ from typing import Optional, Union
 from aeclib.core import (
     ComplianceResult,
     ComplianceStatus,
+    RoomType,
 )
 from aeclib.us.common import (
     OccupancyClassification,
 )
 from aeclib.us.common.dimensions import MINIMUM_CEILING_HEIGHT_STANDARD_INCHES
-from aeclib.us.interior import RoomType, validate_minimum_ceiling_height
+from aeclib.us.garage import validate_garage_clear_height
+from aeclib.us.interior import validate_minimum_ceiling_height
 
 from .constants import (
     MAXIMUM_FLOOR_AREA_ALLOWANCES_PER_OCCUPANT,
@@ -22,6 +24,7 @@ logger = logging.getLogger("aeclib")
 
 def validate_minimum_egress_ceiling_height(
     ceiling_height_inches: float,
+    room_type: Optional[Union[str, RoomType]] = None,
     occupancy_classification: Optional[Union[str, OccupancyClassification]] = None,
 ) -> ComplianceResult:
     """
@@ -29,11 +32,10 @@ def validate_minimum_egress_ceiling_height(
 
     Applicable to:
     - IBC 2024 Section 1003.2
-    - IBC 2021 Section 1003.2
-    - IBC 2018 Section 1003.2
 
     Args:
         ceiling_height_inches: The measured ceiling height in inches.
+        room_type: The functional category of the room.
         occupancy_classification: The occupancy group (e.g., GROUP_R).
 
     Returns:
@@ -41,19 +43,27 @@ def validate_minimum_egress_ceiling_height(
     """
     logger.info("Checking egress ceiling height...")
 
-    # TODO: Implement Exception 1 (Sloped ceilings defer to Chapter 12).
-    # TODO: Implement Exception 3 (Allowable projections).
-    # TODO: Implement Exception 4 (Stair headroom).
-    # TODO: Implement Exception 5 (Door height).
-    # TODO: Implement Exception 6 (Ramp headroom).
+    # TODO: Implement all egress exceptions
+    # Inform about unimplemented egress exceptions
+    logger.info("NOTE: [Sloped Ceilings] exception is not currently considered.")
+    logger.info("NOTE: [Structural Projections] exception is not currently considered.")
+    logger.info("NOTE: [Stair Headroom] exception is not currently considered.")
+    logger.info("NOTE: [Door Height] exception is not currently considered.")
+    logger.info("NOTE: [Ramp Headroom] exception is not currently considered.")
 
-    # Exceptions 2: Residential units defer to Chapter 12
-    # In Chapter 10, the residential exception specifically applies to
-    # corridors in Group R occupancies.
-    if occupancy_classification == OccupancyClassification.GROUP_R:
+    # [Parking Garages] exception: defer to Section 406.2.2
+    if room_type == RoomType.PARKING_GARAGE:
+        return validate_garage_clear_height(clear_height_inches=ceiling_height_inches)
+
+    # [Residential Unit Corridors] exception: defer to Chapter 12 (Interior)
+    # The code allows a reduction to 7'0" for corridors in Group R
+    if (
+        room_type == RoomType.CORRIDOR
+        and occupancy_classification == OccupancyClassification.GROUP_R
+    ):
         return validate_minimum_ceiling_height(
             ceiling_height_inches=ceiling_height_inches,
-            room_type=RoomType.CORRIDOR,
+            room_type=room_type,
             occupancy_classification=occupancy_classification,
         )
 
@@ -82,8 +92,6 @@ def validate_occupant_load_without_fixed_seating(
 
     Applicable to:
     - IBC 2024 Section 1004.5
-    - IBC 2021 Section 1004.5
-    - IBC 2018 Section 1004.5
 
     Args:
         function_type: The functional category of the space.
@@ -131,8 +139,6 @@ def validate_increased_occupant_load(
 
     Applicable to:
     - IBC 2024 Section 1004.5.1
-    - IBC 2021 Section 1004.5.1
-    - IBC 2018 Section 1004.5.1
 
     Args:
         area: The occupiable floor space.

@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from aeclib.core import ComplianceStatus
+from aeclib.core import ComplianceStatus, RoomType
 from aeclib.us.common import OccupancyClassification
 from aeclib.us.egress import (
     validate_increased_occupant_load,
@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.WARNING)
 
 
 def test_validate_minimum_egress_ceiling_height_standard_pass():
-    # Standard rule: 7'6" (90") -> PASS
+    # [Standard Egress Height]: 90" (7'6") -> PASS
     result = validate_minimum_egress_ceiling_height(ceiling_height_inches=90.0)
     assert result.status == ComplianceStatus.PASS
     assert bool(result) is True
@@ -28,24 +28,30 @@ def test_validate_minimum_egress_ceiling_height_standard_pass():
 
 
 def test_validate_minimum_egress_ceiling_height_standard_fail():
-    # 7'0" (84") -> FAIL
+    # [Standard Egress Height]: 84" (7'0") -> FAIL (Standard egress is 90")
     result = validate_minimum_egress_ceiling_height(ceiling_height_inches=84.0)
     assert result.status == ComplianceStatus.FAIL
     assert bool(result) is False
 
 
 def test_validate_minimum_egress_ceiling_height_exceptions():
-    # Exception 2: Residential Unit (calls interior.validate_minimum_ceiling_height)
-    # Residential unit corridors (Group R) are allowed at 7'0" (84")
+    # [Residential Unit Corridor]: Reduced to 84" (7'0") in Group R
     result = validate_minimum_egress_ceiling_height(
         ceiling_height_inches=84.0,
+        room_type=RoomType.CORRIDOR,
         occupancy_classification=OccupancyClassification.GROUP_R,
+    )
+    assert result.status == ComplianceStatus.PASS
+
+    # [Parking Garage Clearance]: Reduced to 84" (7'0")
+    result = validate_minimum_egress_ceiling_height(
+        ceiling_height_inches=84.0, room_type=RoomType.PARKING_GARAGE
     )
     assert result.status == ComplianceStatus.PASS
 
 
 def test_validate_occupant_load_business_gross():
-    # Business: 1500 Gross, 1200 Net. Factor is 150 Gross.
+    # [Occupant Load - Business]: 1500 Gross, 1200 Net. Factor is 150 Gross.
     # Required: 1500 / 150 = 10.
     # Case A: Declared 12 -> PASS
     result = validate_occupant_load_without_fixed_seating(
@@ -59,7 +65,7 @@ def test_validate_occupant_load_business_gross():
 
 
 def test_validate_occupant_load_classroom_net():
-    # Classroom: 1000 Gross, 800 Net. Factor is 20 Net.
+    # [Occupant Load - Classroom]: 1000 Gross, 800 Net. Factor is 20 Net.
     # Required: 800 / 20 = 40.
     # Case B: Declared 35 -> FAIL
     result = validate_occupant_load_without_fixed_seating(
@@ -73,7 +79,8 @@ def test_validate_occupant_load_classroom_net():
 
 
 def test_validate_increased_occupant_load():
-    # Density check: 1000 sqft / 200 people = 5 sqft/person (Limit 7) -> FAIL
+    # [High-Density Occupant Load]: 1000 sqft / 200 people = 5 sqft/person
+    # Limit is 7 sqft/person -> FAIL
     result = validate_increased_occupant_load(area=1000, occupant_count=200)
     assert result.status == ComplianceStatus.FAIL
     assert bool(result) is False
@@ -91,7 +98,7 @@ def test_invalid_function_type():
 
 
 def test_zero_occupancy_is_always_compliant():
-    # 1004.5.1: If there are no people, there is no density issue.
+    # [Occupant Load Baseline]: If there are no people, there is no density issue.
     assert (
         validate_increased_occupant_load(area=1000, occupant_count=0).status
         == ComplianceStatus.PASS

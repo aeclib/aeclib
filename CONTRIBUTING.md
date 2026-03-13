@@ -18,7 +18,8 @@ Before writing any code, please read our **[DEVELOPMENT.md](DEVELOPMENT.md)**. I
 To set up your local development environment and run tests, refer to the **Getting Started** section in `DEVELOPMENT.md`.
 
 ### 4. Submitting a Pull Request
-- Ensure your code follows the established style and technical standards.
+- **Strict Change Scoping:** Keep pull requests atomic and focused only on the stated objective; avoid combining unrelated stylistic cleanups or reformatting with logic changes.
+- Ensure your code follows the established style and technical standards in **[STYLE.md](STYLE.md)**.
 - Include unit tests for every new rule or domain.
 - Use **Conventional Commits** for your commit messages.
 - Provide a clear description of the technical rationale for your changes.
