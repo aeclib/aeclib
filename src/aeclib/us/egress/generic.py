@@ -1,8 +1,15 @@
 import logging
-from typing import Union
+from typing import Optional, Union
 
-from aeclib.common import ComplianceResult, ComplianceStatus
-from aeclib.common.dimensions import MINIMUM_CEILING_HEIGHT_STANDARD_INCHES
+from aeclib.core import (
+    ComplianceResult,
+    ComplianceStatus,
+)
+from aeclib.us.common import (
+    OccupancyClassification,
+)
+from aeclib.us.common.dimensions import MINIMUM_CEILING_HEIGHT_STANDARD_INCHES
+from aeclib.us.interior import RoomType, validate_minimum_ceiling_height
 
 from .constants import (
     MAXIMUM_FLOOR_AREA_ALLOWANCES_PER_OCCUPANT,
@@ -13,10 +20,12 @@ from .constants import (
 logger = logging.getLogger("aeclib")
 
 
-def validate_ceiling_height(ceiling_height_inches: float) -> ComplianceResult:
+def validate_minimum_egress_ceiling_height(
+    ceiling_height_inches: float,
+    occupancy_classification: Optional[Union[str, OccupancyClassification]] = None,
+) -> ComplianceResult:
     """
-    Validates that the ceiling height meets the minimum requirement
-    for the means of egress.
+    Validates ceiling height for the means of egress.
 
     Applicable to:
     - IBC 2024 Section 1003.2
@@ -25,26 +34,38 @@ def validate_ceiling_height(ceiling_height_inches: float) -> ComplianceResult:
 
     Args:
         ceiling_height_inches: The measured ceiling height in inches.
+        occupancy_classification: The occupancy group (e.g., GROUP_R).
 
     Returns:
-        ComplianceResult object with PASS, FAIL, or NOT_APPLICABLE status.
+        ComplianceResult. (PASS, FAIL, NOT_APPLICABLE)
     """
-    logger.info(f"Checking ceiling height: {ceiling_height_inches} inches...")
+    logger.info("Checking egress ceiling height...")
 
-    if ceiling_height_inches < 0:
+    # TODO: Implement Exception 1 (Sloped ceilings defer to Chapter 12).
+    # TODO: Implement Exception 3 (Allowable projections).
+    # TODO: Implement Exception 4 (Stair headroom).
+    # TODO: Implement Exception 5 (Door height).
+    # TODO: Implement Exception 6 (Ramp headroom).
+
+    # Exceptions 2: Residential units defer to Chapter 12
+    # In Chapter 10, the residential exception specifically applies to
+    # corridors in Group R occupancies.
+    if occupancy_classification == OccupancyClassification.GROUP_R:
+        return validate_minimum_ceiling_height(
+            ceiling_height_inches=ceiling_height_inches,
+            room_type=RoomType.CORRIDOR,
+            occupancy_classification=occupancy_classification,
+        )
+
+    # Standard Egress Rule: 7' 6"
+    if ceiling_height_inches < MINIMUM_CEILING_HEIGHT_STANDARD_INCHES:
         return ComplianceResult(
-            status=ComplianceStatus.NOT_APPLICABLE,
-            message="Measured height is negative; check source data.",
+            status=ComplianceStatus.FAIL,
+            message=(
+                f'[FAIL] Egress ceiling height {ceiling_height_inches}" '
+                f'is below standard 90" minimum.'
+            ),
         )
-
-    is_compliant = ceiling_height_inches >= MINIMUM_CEILING_HEIGHT_STANDARD_INCHES
-
-    if not is_compliant:
-        message = (
-            f'[FAIL] Ceiling height ({ceiling_height_inches}") is less than '
-            f'required minimum of {MINIMUM_CEILING_HEIGHT_STANDARD_INCHES}".'
-        )
-        return ComplianceResult(status=ComplianceStatus.FAIL, message=message)
 
     return ComplianceResult(status=ComplianceStatus.PASS)
 
@@ -65,13 +86,13 @@ def validate_occupant_load_without_fixed_seating(
     - IBC 2018 Section 1004.5
 
     Args:
-        function_type: The functional category of the space (e.g., 'business').
+        function_type: The functional category of the space.
         gross_area: The gross floor area.
         net_area: The net floor area.
         design_occupancy_count: The intended number of occupants.
 
     Returns:
-        ComplianceResult object with PASS, FAIL, or NOT_APPLICABLE status.
+        ComplianceResult. (PASS, FAIL, NOT_APPLICABLE)
     """
     rule = MAXIMUM_FLOOR_AREA_ALLOWANCES_PER_OCCUPANT.get(function_type)
     if not rule:
@@ -79,7 +100,6 @@ def validate_occupant_load_without_fixed_seating(
         raise ValueError(f"Function type '{function_type}' is not supported.")
 
     logger.info(f"Checking {function_type} occupancy load factors...")
-    logger.info(f"{function_type} occupancy load factors: {rule}")
     factor = rule["factor"]
     basis = rule["basis"]
 
@@ -94,8 +114,8 @@ def validate_occupant_load_without_fixed_seating(
 
     if not is_compliant:
         message = (
-            f"[FAIL] Design occupancy ({design_occupancy_count}) is less than "
-            f"required minimum of {required_min} for {function_type} "
+            f"[FAIL] Design occupancy ({design_occupancy_count}) "
+            f"is less than required minimum of {required_min} for {function_type} "
             f"({basis} area: {effective_area}, factor: {factor})."
         )
         return ComplianceResult(status=ComplianceStatus.FAIL, message=message)
@@ -119,7 +139,7 @@ def validate_increased_occupant_load(
         occupant_count: The intended number of occupants.
 
     Returns:
-        ComplianceResult object with PASS, FAIL, or NOT_APPLICABLE status.
+        ComplianceResult. (PASS, FAIL, NOT_APPLICABLE)
     """
     if occupant_count <= 0:
         return ComplianceResult(status=ComplianceStatus.PASS)

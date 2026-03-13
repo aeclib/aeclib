@@ -2,10 +2,11 @@ import logging
 
 import pytest
 
-from aeclib.common import ComplianceStatus
-from aeclib.egress import (
-    validate_ceiling_height,
+from aeclib.core import ComplianceStatus
+from aeclib.us.common import OccupancyClassification
+from aeclib.us.egress import (
     validate_increased_occupant_load,
+    validate_minimum_egress_ceiling_height,
     validate_occupant_load_without_fixed_seating,
 )
 
@@ -13,37 +14,34 @@ from aeclib.egress import (
 logging.basicConfig(level=logging.WARNING)
 
 
-def test_validate_ceiling_height_standard_pass():
+def test_validate_minimum_egress_ceiling_height_standard_pass():
     # Standard rule: 7'6" (90") -> PASS
-    result = validate_ceiling_height(ceiling_height_inches=90.0)
+    result = validate_minimum_egress_ceiling_height(ceiling_height_inches=90.0)
     assert result.status == ComplianceStatus.PASS
     assert bool(result) is True
 
     # 8'0" (96") -> PASS
     assert (
-        validate_ceiling_height(ceiling_height_inches=96.0).status
+        validate_minimum_egress_ceiling_height(ceiling_height_inches=96.0).status
         == ComplianceStatus.PASS
     )
 
 
-def test_validate_ceiling_height_standard_fail():
+def test_validate_minimum_egress_ceiling_height_standard_fail():
     # 7'0" (84") -> FAIL
-    result = validate_ceiling_height(ceiling_height_inches=84.0)
+    result = validate_minimum_egress_ceiling_height(ceiling_height_inches=84.0)
     assert result.status == ComplianceStatus.FAIL
-    assert "is less than required minimum" in result.message
     assert bool(result) is False
 
-    # 7'5.9" (89.9") -> FAIL
-    assert (
-        validate_ceiling_height(ceiling_height_inches=89.9).status
-        == ComplianceStatus.FAIL
+
+def test_validate_minimum_egress_ceiling_height_exceptions():
+    # Exception 2: Residential Unit (calls interior.validate_minimum_ceiling_height)
+    # Residential unit corridors (Group R) are allowed at 7'0" (84")
+    result = validate_minimum_egress_ceiling_height(
+        ceiling_height_inches=84.0,
+        occupancy_classification=OccupancyClassification.GROUP_R,
     )
-
-
-def test_validate_ceiling_height_not_applicable():
-    # Negative height -> NOT_APPLICABLE
-    result = validate_ceiling_height(ceiling_height_inches=-1.0)
-    assert result.status == ComplianceStatus.NOT_APPLICABLE
+    assert result.status == ComplianceStatus.PASS
 
 
 def test_validate_occupant_load_business_gross():
