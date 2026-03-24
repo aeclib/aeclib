@@ -21,7 +21,7 @@ def validate_garage_clear_height(
     Returns:
         ComplianceResult. (PASS, FAIL, NOT_APPLICABLE)
     """
-    logger.info("Checking Section 406.2.2 parking garage clear height...")
+    logger.info("Checking parking garage clear height...")
 
     # Standard requirement: 7 feet 0 inches (84")
     threshold = MINIMUM_CEILING_HEIGHT_SERVICE_INCHES

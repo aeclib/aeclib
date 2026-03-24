@@ -38,7 +38,7 @@ def validate_minimum_ceiling_height(
     Returns:
         ComplianceResult. (PASS, FAIL, NOT_APPLICABLE)
     """
-    logger.info(f"Checking Section 1208.2 minimum ceiling height for {room_type}...")
+    logger.info(f"Checking minimum ceiling height for {room_type}...")
 
     # Explicit Out-of-Scope handling
     if room_type in {RoomType.ATTIC, RoomType.CRAWL_SPACE}:
