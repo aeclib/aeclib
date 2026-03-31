@@ -19,9 +19,7 @@ def test_validate_minimum_ceiling_height_standard():
 
 def test_validate_minimum_ceiling_height_service():
     # [Service Area Height]: Kitchen -> 84" (7'0")
-    result = validate_minimum_ceiling_height(
-        ceiling_height_inches=84.0, room_type=RoomType.KITCHEN
-    )
+    result = validate_minimum_ceiling_height(ceiling_height_inches=84.0, room_type=RoomType.KITCHEN)
     assert result.status == ComplianceStatus.PASS
 
 
@@ -46,23 +44,17 @@ def test_validate_minimum_ceiling_height_residential_unit_corridor():
 def test_validate_minimum_ceiling_height_mezzanine():
     # [Mezzanine Height]: Mezzanines and spaces below -> 84" (7'0")
     assert (
-        validate_minimum_ceiling_height(
-            ceiling_height_inches=84.0, room_type=RoomType.MEZZANINE
-        ).status
+        validate_minimum_ceiling_height(ceiling_height_inches=84.0, room_type=RoomType.MEZZANINE).status
         == ComplianceStatus.PASS
     )
 
     assert (
-        validate_minimum_ceiling_height(
-            ceiling_height_inches=84.0, room_type=RoomType.BELOW_MEZZANINE
-        ).status
+        validate_minimum_ceiling_height(ceiling_height_inches=84.0, room_type=RoomType.BELOW_MEZZANINE).status
         == ComplianceStatus.PASS
     )
 
 
 def test_validate_minimum_ceiling_height_out_of_scope():
     # [Out-of-Scope]: Attic is not subject to general habitability height standards.
-    result = validate_minimum_ceiling_height(
-        ceiling_height_inches=48.0, room_type=RoomType.ATTIC
-    )
+    result = validate_minimum_ceiling_height(ceiling_height_inches=48.0, room_type=RoomType.ATTIC)
     assert result.status == ComplianceStatus.NOT_APPLICABLE

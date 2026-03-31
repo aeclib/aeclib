@@ -21,10 +21,7 @@ def test_validate_minimum_egress_ceiling_height_standard_pass():
     assert bool(result) is True
 
     # 8'0" (96") -> PASS
-    assert (
-        validate_minimum_egress_ceiling_height(ceiling_height_inches=96.0).status
-        == ComplianceStatus.PASS
-    )
+    assert validate_minimum_egress_ceiling_height(ceiling_height_inches=96.0).status == ComplianceStatus.PASS
 
 
 def test_validate_minimum_egress_ceiling_height_standard_fail():
@@ -44,9 +41,7 @@ def test_validate_minimum_egress_ceiling_height_exceptions():
     assert result.status == ComplianceStatus.PASS
 
     # [Parking Garage Clearance]: Reduced to 84" (7'0")
-    result = validate_minimum_egress_ceiling_height(
-        ceiling_height_inches=84.0, room_type=RoomType.PARKING_GARAGE
-    )
+    result = validate_minimum_egress_ceiling_height(ceiling_height_inches=84.0, room_type=RoomType.PARKING_GARAGE)
     assert result.status == ComplianceStatus.PASS
 
 
@@ -99,11 +94,5 @@ def test_invalid_function_type():
 
 def test_zero_occupancy_is_always_compliant():
     # [Occupant Load Baseline]: If there are no people, there is no density issue.
-    assert (
-        validate_increased_occupant_load(area=1000, occupant_count=0).status
-        == ComplianceStatus.PASS
-    )
-    assert (
-        validate_increased_occupant_load(area=1000, occupant_count=-1).status
-        == ComplianceStatus.PASS
-    )
+    assert validate_increased_occupant_load(area=1000, occupant_count=0).status == ComplianceStatus.PASS
+    assert validate_increased_occupant_load(area=1000, occupant_count=-1).status == ComplianceStatus.PASS

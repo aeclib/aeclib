@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Union
+from typing import Optional
 
 from aeclib.core import (
     ComplianceResult,
@@ -21,8 +21,8 @@ logger = logging.getLogger("aeclib")
 
 def validate_minimum_ceiling_height(
     ceiling_height_inches: float,
-    room_type: Optional[Union[str, RoomType]] = None,
-    occupancy_classification: Optional[Union[str, OccupancyClassification]] = None,
+    room_type: Optional[RoomType] = None,
+    occupancy_classification: Optional[OccupancyClassification] = None,
 ) -> ComplianceResult:
     """
     Validates general minimum ceiling height requirements.
@@ -42,16 +42,11 @@ def validate_minimum_ceiling_height(
 
     # Explicit Out-of-Scope handling
     if room_type in {RoomType.ATTIC, RoomType.CRAWL_SPACE}:
-        message = (
-            f"[NOT_APPLICABLE] Minimum ceiling height standards "
-            f"do not apply to {room_type}."
-        )
+        message = f"[NOT_APPLICABLE] Minimum ceiling height standards do not apply to {room_type}."
         return ComplianceResult(status=ComplianceStatus.NOT_APPLICABLE, message=message)
 
     # TODO: Implement [Structural Projections/Beams] exception.
-    logger.info(
-        "NOTE: [Structural Projections/Beams] exception is not currently considered."
-    )
+    logger.info("NOTE: [Structural Projections/Beams] exception is not currently considered.")
 
     # TODO: Implement [Sloped Ceilings] exception (50% area rule and 5' deduction).
     logger.info("NOTE: [Sloped Ceilings] exception is not currently considered.")
@@ -61,16 +56,11 @@ def validate_minimum_ceiling_height(
 
     # 1. Determine baseline threshold
     # Default to 90" (Habitable/Occupiable baseline) unless specifically mapped
-    threshold = ROOM_HEIGHT_THRESHOLDS.get(
-        room_type, MINIMUM_CEILING_HEIGHT_STANDARD_INCHES
-    )
+    threshold = ROOM_HEIGHT_THRESHOLDS.get(room_type, MINIMUM_CEILING_HEIGHT_STANDARD_INCHES)
 
     # 2. Handle [Residential Unit Corridor] exception
     # Reduced to 7' 0" (84")
-    if (
-        room_type == RoomType.CORRIDOR
-        and occupancy_classification == OccupancyClassification.GROUP_R
-    ):
+    if room_type == RoomType.CORRIDOR and occupancy_classification == OccupancyClassification.GROUP_R:
         threshold = MINIMUM_CEILING_HEIGHT_SERVICE_INCHES
 
     # 3. Standard height check
@@ -78,8 +68,7 @@ def validate_minimum_ceiling_height(
         return ComplianceResult(
             status=ComplianceStatus.FAIL,
             message=(
-                f'[FAIL] Ceiling height {ceiling_height_inches}" '
-                f'is below the {threshold}" minimum for {room_type}.'
+                f'[FAIL] Ceiling height {ceiling_height_inches}" is below the {threshold}" minimum for {room_type}.'
             ),
         )
 

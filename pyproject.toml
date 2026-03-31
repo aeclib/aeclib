@@ -37,7 +37,7 @@ where = ["src"]
 [tool.ruff]
 # Target Python 3.9
 target-version = "py39"
-line-length = 88
+line-length = 120
 
 [tool.ruff.lint]
 # Enable standard linting rules (E: Error, F: Pyflakes, I: Isort)
