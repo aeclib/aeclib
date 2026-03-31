@@ -45,7 +45,7 @@ Every rule must be traceable back to a specific technical or legal provision.
 - **Python Version:** Target Python >= 3.9.
 - **Type Hinting:** Mandatory for all public APIs.
 - **Domain-First Namespacing:** Organize rules by technical domain (e.g., `aeclib.occupancy`) and expose them at the top level via `__init__.py`.
-- **String-Friendly Enums:** Use `StrEnum`-style patterns internally for robust data management while allowing users to provide raw strings.
+- **String-Friendly Enums:** Use `str, Enum` patterns for all domain categories. To keep the API clean and architect-friendly, use the Enum class itself as the type hint (e.g., `use: LiveLoadUse`) instead of `Union[str, LiveLoadUse]`; the `str, Enum` pattern ensures that raw strings remain compatible for equality, hashing, and dictionary lookups.
 
 ## 3. Build and Test Sequence
 `aeclib` uses **tox** to orchestrate testing, linting, and formatting in isolated environments.
@@ -58,7 +58,7 @@ tox
 ```
 
 ### 3.2 Automated Formatting and Fixing
-To automatically fix linting issues and reformat the code to meet the project's style standards (Line length 88, etc.):
+To automatically fix linting issues and reformat the code to meet the project's style standards (Line length 120, etc.):
 
 ```bash
 tox -e fix
@@ -71,7 +71,7 @@ tox -e fix
 
 ### 3.4 Style Standards
 - **Linter/Formatter:** `ruff`
-- **Max Line Length:** 88 characters
+- **Max Line Length:** 120 characters
 - **Quotes:** Double quotes preferred
 - **Import Sorting:** Automatic via `ruff` (isort rules)
 

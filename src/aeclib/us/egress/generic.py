@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, Union
+from typing import Optional
 
 from aeclib.core import (
     ComplianceResult,
@@ -24,8 +24,8 @@ logger = logging.getLogger("aeclib")
 
 def validate_minimum_egress_ceiling_height(
     ceiling_height_inches: float,
-    room_type: Optional[Union[str, RoomType]] = None,
-    occupancy_classification: Optional[Union[str, OccupancyClassification]] = None,
+    room_type: Optional[RoomType] = None,
+    occupancy_classification: Optional[OccupancyClassification] = None,
 ) -> ComplianceResult:
     """
     Validates ceiling height for the means of egress.
@@ -57,10 +57,7 @@ def validate_minimum_egress_ceiling_height(
 
     # [Residential Unit Corridors] exception: defer to Chapter 12 (Interior)
     # The code allows a reduction to 7'0" for corridors in Group R
-    if (
-        room_type == RoomType.CORRIDOR
-        and occupancy_classification == OccupancyClassification.GROUP_R
-    ):
+    if room_type == RoomType.CORRIDOR and occupancy_classification == OccupancyClassification.GROUP_R:
         return validate_minimum_ceiling_height(
             ceiling_height_inches=ceiling_height_inches,
             room_type=room_type,
@@ -71,17 +68,14 @@ def validate_minimum_egress_ceiling_height(
     if ceiling_height_inches < MINIMUM_CEILING_HEIGHT_STANDARD_INCHES:
         return ComplianceResult(
             status=ComplianceStatus.FAIL,
-            message=(
-                f'[FAIL] Egress ceiling height {ceiling_height_inches}" '
-                f'is below standard 90" minimum.'
-            ),
+            message=(f'[FAIL] Egress ceiling height {ceiling_height_inches}" is below standard 90" minimum.'),
         )
 
     return ComplianceResult(status=ComplianceStatus.PASS)
 
 
 def validate_occupant_load_without_fixed_seating(
-    function_type: Union[str, SpaceFunction],
+    function_type: SpaceFunction,
     gross_area: float,
     net_area: float,
     design_occupancy_count: int,
@@ -131,9 +125,7 @@ def validate_occupant_load_without_fixed_seating(
     return ComplianceResult(status=ComplianceStatus.PASS)
 
 
-def validate_increased_occupant_load(
-    area: float, occupant_count: int
-) -> ComplianceResult:
+def validate_increased_occupant_load(area: float, occupant_count: int) -> ComplianceResult:
     """
     Validates that the occupant load does not exceed the limit for increased loads.
 
@@ -156,8 +148,7 @@ def validate_increased_occupant_load(
 
     if not is_compliant:
         message = (
-            f"[FAIL] Occupant count {occupant_count} "
-            f"exceeds limit of {max_occupant_count:.2f} (1 person per 7 sqft)."
+            f"[FAIL] Occupant count {occupant_count} exceeds limit of {max_occupant_count:.2f} (1 person per 7 sqft)."
         )
         return ComplianceResult(status=ComplianceStatus.FAIL, message=message)
 
