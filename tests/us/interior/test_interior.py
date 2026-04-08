@@ -2,7 +2,47 @@ import logging
 
 from aeclib.core import ComplianceStatus, RoomType
 from aeclib.us.common import OccupancyClassification
-from aeclib.us.interior import validate_minimum_ceiling_height
+from aeclib.us.interior.generic import (
+    validate_minimum_ceiling_height,
+    validate_minimum_room_width,
+)
+
+
+def test_validate_minimum_room_width_pass():
+    # Pass scenario for Habitable Space (>= 7')
+    result = validate_minimum_room_width(width_inches=84.0)
+    assert result.status == ComplianceStatus.PASS
+
+    # Pass scenario for Kitchen (>= 3')
+    result = validate_minimum_room_width(width_inches=36.0, room_type=RoomType.KITCHEN)
+    assert result.status == ComplianceStatus.PASS
+
+
+def test_validate_minimum_room_width_fail():
+    # Fail scenario for Habitable Space (< 7')
+    result = validate_minimum_room_width(width_inches=80.0)
+    assert result.status == ComplianceStatus.FAIL
+
+    # Fail scenario for Kitchen (< 3')
+    result = validate_minimum_room_width(width_inches=30.0, room_type=RoomType.KITCHEN)
+    assert result.status == ComplianceStatus.FAIL
+
+
+def test_validate_minimum_room_width_multi():
+    # Pass scenario for standard rectangular room (8' x 10')
+    result = validate_minimum_room_width(width_inches=[96.0, 120.0])
+    assert result.status == ComplianceStatus.PASS
+
+    # Fail scenario for narrow rectangular room (6' x 15')
+    result = validate_minimum_room_width(width_inches=[72.0, 180.0])
+    assert result.status == ComplianceStatus.FAIL
+
+
+def test_validate_minimum_room_width_not_applicable():
+    # Not Applicable for non-habitable rooms (e.g., Bathroom)
+    result = validate_minimum_room_width(width_inches=30.0, room_type=RoomType.BATHROOM)
+    assert result.status == ComplianceStatus.NOT_APPLICABLE
+
 
 # Configure logging for clearer test output
 logging.basicConfig(level=logging.WARNING)

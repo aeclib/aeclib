@@ -53,7 +53,7 @@ def validate_live_load(
     Returns:
         ComplianceResult. (PASS, FAIL)
     """
-    logger.info(f"Checking IBC Section 1607.1 live loads for {use}...")
+    logger.info(f"Checking minimum live loads for {use}...")
 
     # 1. Handle Alias Rerouting
     # 'Apartments' and 'Hotels' are shorthand for Residential 'Private' areas.
