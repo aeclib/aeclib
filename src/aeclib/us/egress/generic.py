@@ -51,11 +51,11 @@ def validate_minimum_egress_ceiling_height(
     logger.info("NOTE: [Door Height] exception is not currently considered.")
     logger.info("NOTE: [Ramp Headroom] exception is not currently considered.")
 
-    # [Parking Garages] exception: defer to Section 406.2.2
+    # [Parking Garages] exception
     if room_type == RoomType.PARKING_GARAGE:
         return validate_garage_clear_height(clear_height_inches=ceiling_height_inches)
 
-    # [Residential Unit Corridors] exception: defer to Chapter 12 (Interior)
+    # [Residential Unit Corridors] exception
     # The code allows a reduction to 7'0" for corridors in Group R
     if room_type == RoomType.CORRIDOR and occupancy_classification == OccupancyClassification.GROUP_R:
         return validate_minimum_ceiling_height(
