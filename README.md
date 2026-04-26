@@ -1,4 +1,5 @@
-# aeclib
+# aeclib: Building Code Compliance Library
+
 Open-source automated code compliance building codes and standards.
 
 aeclib translates building code provisions into executable and testable logic.
@@ -65,3 +66,6 @@ When a design is compliant, the function returns `PASS`.
 ## License
 
 Licensed under the Apache License 2.0.
+
+## Stay Updated
+You can get project updates on the architecture and design decisions behind `aeclib` on [Substack](https://aeccoder.substack.com/).
