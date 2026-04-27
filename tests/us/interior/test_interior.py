@@ -1,7 +1,7 @@
 import logging
 
 from aeclib.core import ComplianceStatus, RoomType
-from aeclib.us.common import OccupancyClassification
+from aeclib.us.common import Occupancy
 from aeclib.us.interior.generic import (
     validate_minimum_ceiling_height,
     validate_minimum_room_width,
@@ -68,7 +68,7 @@ def test_validate_minimum_ceiling_height_residential_unit_corridor():
     result = validate_minimum_ceiling_height(
         ceiling_height_inches=84.0,
         room_type=RoomType.CORRIDOR,
-        occupancy_classification=OccupancyClassification.GROUP_R,
+        occupancy=Occupancy.GROUP_R,
     )
     assert result.status == ComplianceStatus.PASS
 
@@ -76,7 +76,7 @@ def test_validate_minimum_ceiling_height_residential_unit_corridor():
     result = validate_minimum_ceiling_height(
         ceiling_height_inches=84.0,
         room_type=RoomType.CORRIDOR,
-        occupancy_classification=OccupancyClassification.GROUP_B,
+        occupancy=Occupancy.GROUP_B,
     )
     assert result.status == ComplianceStatus.FAIL
 

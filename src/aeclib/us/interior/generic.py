@@ -7,7 +7,8 @@ from aeclib.core import (
     RoomType,
 )
 from aeclib.us.common import (
-    OccupancyClassification,
+    Occupancy,
+    is_base_classification,
 )
 from aeclib.us.common.dimensions import (
     MINIMUM_CEILING_HEIGHT_SERVICE_INCHES,
@@ -83,10 +84,7 @@ def validate_minimum_room_width(
         if dim < threshold:
             return ComplianceResult(
                 status=ComplianceStatus.FAIL,
-                message=(
-                    f"[FAIL] {label} of {dim}\" is less than "
-                    f"the minimum required {threshold}\"."
-                ),
+                message=(f'[FAIL] {label} of {dim}" is less than the minimum required {threshold}".'),
             )
 
     return ComplianceResult(status=ComplianceStatus.PASS)
@@ -95,7 +93,7 @@ def validate_minimum_room_width(
 def validate_minimum_ceiling_height(
     ceiling_height_inches: float,
     room_type: Optional[RoomType] = None,
-    occupancy_classification: Optional[OccupancyClassification] = None,
+    occupancy: Optional[Occupancy] = None,
 ) -> ComplianceResult:
     """
     Validates general minimum ceiling height requirements.
@@ -106,7 +104,7 @@ def validate_minimum_ceiling_height(
     Args:
         ceiling_height_inches: The measured ceiling height in inches.
         room_type: The functional category of the room (None = Standard space).
-        occupancy_classification: The occupancy group (e.g., GROUP_R).
+        occupancy: The occupancy group (e.g., GROUP_R).
 
     Returns:
         ComplianceResult. (PASS, FAIL, NOT_APPLICABLE)
@@ -133,7 +131,7 @@ def validate_minimum_ceiling_height(
 
     # 2. Handle [Residential Unit Corridor] exception
     # Reduced to 7' 0" (84")
-    if room_type == RoomType.CORRIDOR and occupancy_classification == OccupancyClassification.GROUP_R:
+    if room_type == RoomType.CORRIDOR and occupancy and is_base_classification(occupancy, Occupancy.GROUP_R):
         threshold = MINIMUM_CEILING_HEIGHT_SERVICE_INCHES
 
     # 3. Standard height check

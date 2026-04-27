@@ -3,7 +3,7 @@ import logging
 import pytest
 
 from aeclib.core import ComplianceStatus, RoomType
-from aeclib.us.common import OccupancyClassification
+from aeclib.us.common import Occupancy
 from aeclib.us.egress import (
     validate_increased_occupant_load,
     validate_minimum_egress_ceiling_height,
@@ -36,7 +36,7 @@ def test_validate_minimum_egress_ceiling_height_exceptions():
     result = validate_minimum_egress_ceiling_height(
         ceiling_height_inches=84.0,
         room_type=RoomType.CORRIDOR,
-        occupancy_classification=OccupancyClassification.GROUP_R,
+        occupancy=Occupancy.GROUP_R,
     )
     assert result.status == ComplianceStatus.PASS
 

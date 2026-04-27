@@ -7,7 +7,8 @@ from aeclib.core import (
     RoomType,
 )
 from aeclib.us.common import (
-    OccupancyClassification,
+    Occupancy,
+    is_base_classification,
 )
 from aeclib.us.common.dimensions import MINIMUM_CEILING_HEIGHT_STANDARD_INCHES
 from aeclib.us.garage import validate_garage_clear_height
@@ -25,7 +26,7 @@ logger = logging.getLogger("aeclib")
 def validate_minimum_egress_ceiling_height(
     ceiling_height_inches: float,
     room_type: Optional[RoomType] = None,
-    occupancy_classification: Optional[OccupancyClassification] = None,
+    occupancy: Optional[Occupancy] = None,
 ) -> ComplianceResult:
     """
     Validates ceiling height for the means of egress.
@@ -36,7 +37,7 @@ def validate_minimum_egress_ceiling_height(
     Args:
         ceiling_height_inches: The measured ceiling height in inches.
         room_type: The functional category of the room.
-        occupancy_classification: The occupancy group (e.g., GROUP_R).
+        occupancy: The occupancy group (e.g., GROUP_R).
 
     Returns:
         ComplianceResult. (PASS, FAIL, NOT_APPLICABLE)
@@ -57,11 +58,11 @@ def validate_minimum_egress_ceiling_height(
 
     # [Residential Unit Corridors] exception
     # The code allows a reduction to 7'0" for corridors in Group R
-    if room_type == RoomType.CORRIDOR and occupancy_classification == OccupancyClassification.GROUP_R:
+    if room_type == RoomType.CORRIDOR and occupancy and is_base_classification(occupancy, Occupancy.GROUP_R):
         return validate_minimum_ceiling_height(
             ceiling_height_inches=ceiling_height_inches,
             room_type=room_type,
-            occupancy_classification=occupancy_classification,
+            occupancy=occupancy,
         )
 
     # Standard Egress Rule: 7' 6"
