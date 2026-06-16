@@ -1,4 +1,3 @@
-# US-specific structural building design requirements.
 from .foundations import (
     DEFAULT_ALLOWABLE_BEARING_PRESSURE,
     SoilClass,
@@ -11,6 +10,10 @@ from .live_loads import (
     get_minimum_live_load,
     validate_live_load,
 )
+from .load_combinations import (
+    DesignMethod,
+    get_load_combinations,
+)
 
 __all__ = [
     "DEFAULT_ALLOWABLE_BEARING_PRESSURE",
@@ -21,4 +24,6 @@ __all__ = [
     "LiveLoadUse",
     "get_minimum_live_load",
     "validate_live_load",
+    "DesignMethod",
+    "get_load_combinations",
 ]
