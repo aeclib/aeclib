@@ -115,3 +115,40 @@ def calculate_development_length(
 
     # Absolute minimum tension development length is 12 inches (ACI 25.4.2.1)
     return max(12.0, l_d)
+
+
+def calculate_hooked_development_length(
+    bar_size: int,
+    steel_yield_strength_psi: float,
+    concrete_strength_psi: float,
+    is_epoxy_coated: bool = False,
+) -> float:
+    """
+    Calculates the tension development length (l_dh) in inches for a standard hook
+    according to ACI 318 simplified equations.
+
+    Applicable to:
+    - ACI 318-25 Section 25.4.3
+
+    Args:
+        bar_size: Standard US bar size number (3 through 11).
+        steel_yield_strength_psi: Reinforcement yield strength (fy) in psi.
+        concrete_strength_psi: Concrete compressive strength (f'c) in psi.
+        is_epoxy_coated: True if the reinforcement is epoxy coated.
+
+    Returns:
+        The calculated tension development length for a hook in inches.
+    """
+    if bar_size not in REBAR_PROPERTIES:
+        raise ValueError(f"Unsupported bar size: #{bar_size}. Supported sizes: {list(REBAR_PROPERTIES.keys())}")
+
+    d_b = REBAR_PROPERTIES[bar_size].nominal_diameter_in
+
+    psi_e = 1.2 if is_epoxy_coated else 1.0
+    lambda_factor = 1.0  # Normal weight concrete
+
+    # Basic development length for standard hook
+    l_dh = (0.02 * psi_e * steel_yield_strength_psi / (lambda_factor * (concrete_strength_psi**0.5))) * d_b
+
+    # Absolute minimums: 8 * d_b or 6 inches
+    return max(l_dh, 8.0 * d_b, 6.0)

@@ -1,3 +1,2 @@
+# ruff: noqa: F401
 from .generic import validate_garage_clear_height
-
-__all__ = ["validate_garage_clear_height"]
