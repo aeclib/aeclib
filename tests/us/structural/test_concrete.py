@@ -5,6 +5,7 @@ import pytest
 from aeclib.core import ComplianceStatus
 from aeclib.us.structural.concrete import (
     calculate_development_length,
+    calculate_hooked_development_length,
     calculate_one_way_shear_capacity,
     calculate_required_flexural_steel_area,
     calculate_two_way_shear_capacity,
@@ -135,3 +136,38 @@ def test_calculate_development_length():
     # Unsupported bar
     with pytest.raises(ValueError, match="Unsupported bar size"):
         calculate_development_length(2, 60000, 3000)
+
+
+def test_calculate_hooked_development_length():
+    # #5 bar, fy=60ksi, f'c=3ksi. psi_e = 1.0
+    # l_dh = (0.02 * 1.0 * 60000 / sqrt(3000)) * 0.625 = 13.69 inches
+    ldh_5 = calculate_hooked_development_length(
+        bar_size=5,
+        steel_yield_strength_psi=60000.0,
+        concrete_strength_psi=3000.0,
+    )
+    assert math.isclose(ldh_5, 13.69, rel_tol=0.01)
+
+    # #5 bar, fy=60ksi, f'c=3ksi, epoxy coated. psi_e = 1.2
+    # l_dh = 13.69 * 1.2 = 16.43 inches
+    ldh_5_epoxy = calculate_hooked_development_length(
+        bar_size=5,
+        steel_yield_strength_psi=60000.0,
+        concrete_strength_psi=3000.0,
+        is_epoxy_coated=True,
+    )
+    assert math.isclose(ldh_5_epoxy, 16.43, rel_tol=0.01)
+
+    # #3 bar, fy=40ksi, f'c=8ksi. psi_e = 1.0
+    # Basic l_dh = (0.02 * 1.0 * 40000 / sqrt(8000)) * 0.375 = 3.35 inches
+    # Absolute minimum controls: 6.0 inches (since 8 * d_b = 3.0 inches)
+    ldh_3_min = calculate_hooked_development_length(
+        bar_size=3,
+        steel_yield_strength_psi=40000.0,
+        concrete_strength_psi=8000.0,
+    )
+    assert math.isclose(ldh_3_min, 6.0, rel_tol=0.01)
+
+    # Unsupported bar size
+    with pytest.raises(ValueError, match="Unsupported bar size"):
+        calculate_hooked_development_length(2, 60000, 3000)
